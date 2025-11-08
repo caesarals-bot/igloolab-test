@@ -26,14 +26,26 @@ export function Navbar({ user }: NavbarProps) {
             // Estado privado (usuario autenticado)
             <>
               <Link
-                to="/dashboard"
+                to="/"
                 className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Dashboard
+                Home
+              </Link>
+              <Link
+                to="/productos"
+                className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Productos
+              </Link>
+              <Link
+                to="/admin/dashboard"
+                className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Admin
               </Link>
               <div className="flex items-center gap-3">
                 <span className="text-base text-muted-foreground hidden sm:inline-block">
-                  Bienvenido, <span className="font-medium text-foreground">{user.nombre}</span>
+                  <span className="font-medium text-foreground">{user.nombre}</span>
                 </span>
                 <Button variant="ghost" size="sm" className="gap-2 text-base">
                   <LogOut className="w-4 h-4" />

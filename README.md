@@ -7,10 +7,10 @@
   
   **Gestión Inteligente de Medicamentos para Laboratorios y Profesionales de la Salud**
   
-  [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![TailwindCSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![React](https://img.shields.io/badge/React-19.1.1-1DAFB?logo=react&logoColor=white)](https://react.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Vite](https://img.shields.io/badge/Vite-7.1.7-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1.17-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
   
   [Demo](https://igloolab.co) • [Documentación](./docs) • [Changelog](./CHANGELOG.md)
@@ -21,18 +21,29 @@
 
 ## 🌟 Características Principales
 
-- **🔒 Seguro y Confiable** - Gestión profesional con los más altos estándares de seguridad
-- **⚡ Rápido y Moderno** - Interface intuitiva optimizada para flujo de trabajo diario
-- **📊 Control Completo** - Gestión precisa de fechas de vencimiento, precios y stock
-- **🎨 UI/UX Excepcional** - Diseño moderno con TailwindCSS y shadcn/ui
-- **📱 Responsive Design** - Optimizado para todos los dispositivos
-- **🌐 React Router v7** - Navegación moderna y eficiente
+### Público
+- **🏠 Landing Page** - Hero atractivo con animaciones y CTA
+- **💊 Catálogo de Productos** - Grid responsive con modal de detalles
+- **🖼️ Imágenes Optimizadas** - Assets con optimización automática de Vite
+
+### Administración
+- **📊 Dashboard Completo** - Estadísticas en tiempo real y acciones rápidas
+- **📦 Gestión de Medicamentos** - CRUD con tabla responsive y formularios
+- **🎛️ Panel de Configuración** - Ajustes de perfil y sistema
+- **🗂️ Sidebar Navegable** - Menú lateral colapsable con estados activos
+
+### Técnico
+- **🔒 Seguridad Documentada** - Guía completa de implementación (AUTHENTICATION.md)
+- **⚡ Rápido y Moderno** - React 19, TypeScript, Vite 7
+- **🎨 UI/UX Excepcional** - TailwindCSS 4 con componentes shadcn/ui
+- **📱 100% Responsive** - Desktop, tablet y mobile
+- **🌐 React Router v7** - Navegación SPA con rutas protegidas preparadas
 
 ## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 
-- Node.js 18+ 
+- Node.js 22.16.0 
 - npm o pnpm
 
 ### Instalación
@@ -57,24 +68,32 @@ http://localhost:5173
 ```
 igloolab-project/
 ├── src/
+│   ├── admin/               # Módulo de administración
+│   │   ├── components/      # ProductTable, ProductForm
+│   │   ├── layout/          # AdminLayout (sidebar)
+│   │   └── page/            # Dashboard, Medications, Settings
 │   ├── app/
-│   │   ├── components/      # Componentes reutilizables
-│   │   │   ├── navbar/
-│   │   │   ├── footer/
-│   │   │   ├── hero/
-│   │   │   └── Features/
-│   │   ├── home/            # Página principal
-│   │   └── layout/          # Layout principal
-│   ├── auth/                # Autenticación
-│   ├── data/                # Datos mock y configuración
-│   ├── types/               # Definiciones de TypeScript
+│   │   ├── components/      # Componentes públicos
+│   │   │   ├── navbar/      # Navbar responsive
+│   │   │   ├── footer/      # Footer
+│   │   │   ├── hero/        # HeroPage
+│   │   │   ├── Features/    # Tarjetas de características
+│   │   │   └── calltoaccion/# CTA Section
+│   │   ├── home/            # HomePage
+│   │   ├── products/        # ProductsPage, ProductCard, Modal
+│   │   └── layout/          # LayoutPage principal
+│   ├── auth/                # Login y Register pages
+│   ├── data/                # mockData (productos, usuarios)
+│   ├── types/               # Definiciones TypeScript
 │   │   ├── user.types.ts
 │   │   ├── product.types.ts
 │   │   └── index.ts
-│   ├── router/              # Configuración de rutas
+│   ├── router/              # AppRouter (8 rutas)
 │   ├── components/          # shadcn/ui components
-│   └── assets/              # Imágenes y recursos
+│   ├── assets/              # Imágenes (.webp)
+│   └── lib/                 # Utilidades
 ├── AGENT.md                 # Guía de desarrollo
+├── AUTHENTICATION.md        # Guía de seguridad
 ├── CHANGELOG.md             # Registro de cambios
 └── README.md                # Este archivo
 ```

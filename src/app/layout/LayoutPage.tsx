@@ -7,7 +7,7 @@ const LayoutPage = () => {
     // MODO DESARROLLO: Cambiar isAuthenticated para alternar entre estados
     // true = modo autenticado (muestra Dashboard y usuario)
     // false = modo público (muestra Home, Productos, Login)
-    const isAuthenticated = false
+    const isAuthenticated = true
     const user = isAuthenticated ? mockUser : null
 
     return (
