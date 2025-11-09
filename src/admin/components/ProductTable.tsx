@@ -1,16 +1,33 @@
+import { useState } from "react"
 import type { Product } from "@/types"
+import { useProductsContext } from "@/context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Edit, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
 interface ProductTableProps {
   products: Product[]
+  onEdit?: (product: Product) => void
+  onRefresh?: () => void
 }
 
-export function ProductTable({ products }: ProductTableProps) {
+export function ProductTable({ products, onEdit, onRefresh }: ProductTableProps) {
+  const { deleteProduct, loading } = useProductsContext()
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "dd MMM yyyy", { locale: es })
   }
@@ -20,6 +37,31 @@ export function ProductTable({ products }: ProductTableProps) {
       style: "currency",
       currency: "USD",
     }).format(price)
+  }
+
+  const handleEdit = (product: Product) => {
+    onEdit?.(product)
+  }
+
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return
+    
+    setIsDeleting(true)
+    const success = await deleteProduct(productToDelete.id)
+    setIsDeleting(false)
+    
+    if (success) {
+      setProductToDelete(null)
+      onRefresh?.()
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setProductToDelete(null)
   }
 
   return (
@@ -47,7 +89,13 @@ export function ProductTable({ products }: ProductTableProps) {
                 <TableCell className="text-muted-foreground">{formatDate(product.fechaVencimiento)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => handleEdit(product)}
+                      disabled={loading}
+                    >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Editar</span>
                     </Button>
@@ -55,6 +103,8 @@ export function ProductTable({ products }: ProductTableProps) {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDeleteClick(product)}
+                      disabled={loading}
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Eliminar</span>
@@ -91,7 +141,13 @@ export function ProductTable({ products }: ProductTableProps) {
             </div>
 
             <div className="flex items-center gap-2 pt-2 border-t border-border">
-              <Button variant="outline" size="sm" className="flex-1 gap-2 bg-transparent">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 gap-2 bg-transparent"
+                onClick={() => handleEdit(product)}
+                disabled={loading}
+              >
                 <Edit className="h-4 w-4" />
                 Editar
               </Button>
@@ -99,6 +155,8 @@ export function ProductTable({ products }: ProductTableProps) {
                 variant="outline"
                 size="sm"
                 className="flex-1 gap-2 text-destructive hover:bg-destructive/10 bg-transparent"
+                onClick={() => handleDeleteClick(product)}
+                disabled={loading}
               >
                 <Trash2 className="h-4 w-4" />
                 Eliminar
@@ -107,6 +165,29 @@ export function ProductTable({ products }: ProductTableProps) {
           </Card>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!productToDelete} onOpenChange={handleCancelDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente el producto{" "}
+              <span className="font-semibold">{productToDelete?.nombre}</span> del inventario.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

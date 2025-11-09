@@ -28,12 +28,15 @@
 
 ### Administración
 - **📊 Dashboard Completo** - Estadísticas en tiempo real y acciones rápidas
-- **📦 Gestión de Medicamentos** - CRUD con tabla responsive y formularios
+- **📦 Gestión de Medicamentos** - CRUD completo con API REST integrada
+- **🖼️ Gestión de Imágenes** - Upload con optimización automática (Cloudinary ready)
 - **🎛️ Panel de Configuración** - Ajustes de perfil y sistema
 - **🗂️ Sidebar Navegable** - Menú lateral colapsable con estados activos
 
 ### Técnico
 - **🔒 Seguridad Documentada** - Guía completa de implementación (AUTHENTICATION.md)
+- **🔗 Backend Integrado** - Context API + Axios + PostgreSQL
+- **🖼️ Cloudinary Ready** - Sistema de imágenes escalable (ver docs/CLOUDINARY-SETUP.md)
 - **⚡ Rápido y Moderno** - React 19, TypeScript, Vite 7
 - **🎨 UI/UX Excepcional** - TailwindCSS 4 con componentes shadcn/ui
 - **📱 100% Responsive** - Desktop, tablet y mobile
@@ -83,6 +86,8 @@ igloolab-project/
 │   │   ├── products/        # ProductsPage, ProductCard, Modal
 │   │   └── layout/          # LayoutPage principal
 │   ├── auth/                # Login y Register pages
+│   ├── context/             # Context API (ProductsContext, DashboardContext)
+│   ├── services/            # API services (axios)
 │   ├── data/                # mockData (productos, usuarios)
 │   ├── types/               # Definiciones TypeScript
 │   │   ├── user.types.ts
@@ -92,6 +97,9 @@ igloolab-project/
 │   ├── components/          # shadcn/ui components
 │   ├── assets/              # Imágenes (.webp)
 │   └── lib/                 # Utilidades
+├── docs/                    # Documentación adicional
+│   ├── CLOUDINARY-SETUP.md  # Guía de configuración de Cloudinary
+│   └── CONTEXT-API-GUIDE.md # Guía de Context API
 ├── AGENT.md                 # Guía de desarrollo
 ├── AUTHENTICATION.md        # Guía de seguridad
 ├── CHANGELOG.md             # Registro de cambios
@@ -106,10 +114,20 @@ igloolab-project/
 - **React Router v7.9.5** - Enrutamiento
 - **Vite 7.1.7** - Build tool y dev server
 
+### Estado & Data
+- **Context API** - Gestión de estado global
+- **Axios** - Cliente HTTP para API REST
+- **date-fns** - Manipulación de fechas
+
 ### Estilos
 - **TailwindCSS 4.1.17** - Framework CSS utility-first
 - **shadcn/ui** - Componentes UI accesibles
 - **Lucide React** - Iconos modernos
+
+### Backend Integration
+- **PostgreSQL** - Base de datos
+- **REST API** - Endpoints para CRUD de productos
+- **Cloudinary** - Almacenamiento y optimización de imágenes (opcional)
 
 ### Desarrollo
 - **ESLint** - Linting de código
@@ -142,6 +160,42 @@ npm run lint            # Ejecuta ESLint
 - Títulos: text-5xl → text-8xl
 - Body: text-xl → text-2xl
 - Animaciones suaves con `fade-in-up`
+
+## 🔗 Backend Integration
+
+### API REST
+
+El frontend está integrado con un backend REST API:
+
+```bash
+# Backend debe estar corriendo en:
+http://localhost:3000
+
+# Endpoints disponibles:
+GET    /api/products       # Listar productos
+POST   /api/products       # Crear producto
+PUT    /api/products/:id   # Actualizar producto
+DELETE /api/products/:id   # Eliminar producto
+GET    /api/dashboard      # Estadísticas
+```
+
+### Context API
+
+Gestión de estado global con Context API:
+
+- **ProductsContext** - CRUD de productos
+- **DashboardContext** - Estadísticas y métricas
+
+Ver [CONTEXT-API-GUIDE.md](./docs/CONTEXT-API-GUIDE.md) para más detalles.
+
+### Gestión de Imágenes
+
+Soporte para dos métodos de imágenes:
+
+1. **Base64** (actual) - Para desarrollo y MVP
+2. **Cloudinary** (recomendado) - Para producción escalable
+
+Ver [CLOUDINARY-SETUP.md](./docs/CLOUDINARY-SETUP.md) para configuración.
 
 ## 🔐 Autenticación
 
