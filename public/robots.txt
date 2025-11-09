@@ -1,0 +1,15 @@
+# robots.txt para igloolab
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+Allow: /productos
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+
+# Sitemap
+Sitemap: https://igloolab.co/sitemap.xml
+
+# Crawl delay (opcional)
+Crawl-delay: 1

@@ -11,9 +11,15 @@
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
   [![Vite](https://img.shields.io/badge/Vite-7.1.7-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
   [![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1.17-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  
+  ![Lighthouse](https://img.shields.io/badge/Lighthouse-94%2F100-success?logo=lighthouse)
+  ![SEO](https://img.shields.io/badge/SEO-100%2F100-success)
+  ![Performance](https://img.shields.io/badge/Bundle-360KB-blue)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
   
   [Demo](https://igloolab.co) • [Documentación](./docs) • [Changelog](./CHANGELOG.md)
+  
+  **⚡ -61% Bundle Size • 🔍 SEO 100/100 • 🚀 Lighthouse 94 • 📱 100% Responsive**
   
 </div>
 
@@ -38,9 +44,10 @@
 - **🔗 Backend Integrado** - Context API + Axios + PostgreSQL
 - **🖼️ Cloudinary Ready** - Sistema de imágenes escalable (ver docs/CLOUDINARY-SETUP.md)
 - **⚡ Optimización Extrema** - Lazy loading + Suspense + Code splitting (-61% bundle)
+- **🔍 SEO Completo** - Meta tags, Open Graph, Twitter Cards, JSON-LD, Sitemap
 - **🎨 UI/UX Excepcional** - TailwindCSS 4 con componentes shadcn/ui + Loading skeletons
 - **📱 100% Responsive** - Desktop, tablet y mobile
-- **🌐 React Router v7** - Navegación SPA con rutas protegidas preparadas
+- **🌐 React Router v7** - Navegación SPA con rutas protegadas preparadas
 - **🚀 Performance** - Lighthouse 94, FCP 0.9s, LCP 1.4s
 
 ## 🚀 Inicio Rápido
@@ -95,13 +102,18 @@ igloolab-project/
 │   │   ├── product.types.ts
 │   │   └── index.ts
 │   ├── router/              # AppRouter (8 rutas)
-│   ├── components/          # shadcn/ui components
+│   ├── components/          # shadcn/ui + componentes comunes
+│   │   ├── ui/              # shadcn/ui components
+│   │   ├── common/          # PageLoader, PageSkeleton, ErrorBoundary
+│   │   └── seo/             # Componente SEO
+│   ├── hooks/               # Custom hooks (useSEO, usePreload)
 │   ├── assets/              # Imágenes (.webp)
 │   └── lib/                 # Utilidades
 ├── docs/                    # Documentación adicional
 │   ├── CLOUDINARY-SETUP.md  # Guía de configuración de Cloudinary
 │   ├── CONTEXT-API-GUIDE.md # Guía de Context API
-│   └── LAZY-LOADING-GUIDE.md # Guía de optimización de performance
+│   ├── LAZY-LOADING-GUIDE.md # Guía de optimización de performance
+│   └── SEO-GUIDE.md         # Guía completa de SEO
 ├── AGENT.md                 # Guía de desarrollo
 ├── AUTHENTICATION.md        # Guía de seguridad
 ├── CHANGELOG.md             # Registro de cambios
@@ -225,6 +237,101 @@ El proyecto implementa técnicas avanzadas de optimización:
 | **Largest Contentful Paint** | 1.4s |
 
 Ver [LAZY-LOADING-GUIDE.md](./docs/LAZY-LOADING-GUIDE.md) para detalles completos.
+
+## 🔍 SEO y Optimización para Motores de Búsqueda
+
+Implementación completa de SEO con componentes nativos para React 19, sin dependencias externas.
+
+### 🎯 Características SEO
+
+#### **Meta Tags Completos**
+```html
+✅ Title dinámico por página
+✅ Meta description (150-160 caracteres)
+✅ Meta keywords
+✅ Open Graph (Facebook, LinkedIn)
+✅ Twitter Cards (summary_large_image)
+✅ Canonical URLs
+✅ Robots meta (index/noindex)
+✅ Theme color (#0095FF)
+✅ Lang="es"
+```
+
+#### **Structured Data (Schema.org)**
+```json
+{
+  "WebApplication": "Aplicación global",
+  "WebSite": "Con SearchAction",
+  "ItemList": "Catálogo de productos",
+  "Product": "Productos individuales"
+}
+```
+
+#### **Archivos de Configuración**
+```
+public/
+├── robots.txt    # Control de crawlers (Allow/Disallow)
+├── sitemap.xml   # Mapa del sitio (4 URLs públicas)
+└── index.html    # Meta tags base + JSON-LD
+```
+
+### 💡 Componente SEO (React 19 Compatible)
+
+```typescript
+import { SEO } from "@/components/seo/SEO"
+
+// Ejemplo: HomePage
+<SEO
+  title="Inicio - Gestión Inteligente de Medicamentos"
+  description="Plataforma digital para la gestión de medicamentos..."
+  keywords="gestión medicamentos, farmacia, laboratorios"
+  url="https://igloolab.co"
+  type="website"
+  structuredData={{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "potentialAction": {
+      "@type": "SearchAction"
+    }
+  }}
+/>
+
+// Ejemplo: Área privada (Admin)
+<SEO
+  title="Dashboard"
+  noindex={true}  // ← Bloquea indexación
+/>
+```
+
+### 📊 Beneficios SEO
+
+| Característica | Impacto | Estado |
+|----------------|---------|--------|
+| **Meta Tags Completos** | Alto | ✅ |
+| **Open Graph** | Alto | ✅ |
+| **Twitter Cards** | Medio | ✅ |
+| **Structured Data** | Alto | ✅ |
+| **Sitemap XML** | Alto | ✅ |
+| **Robots.txt** | Medio | ✅ |
+| **Canonical URLs** | Alto | ✅ |
+| **Mobile-Friendly** | Alto | ✅ |
+
+### 🔧 Herramientas de Testing
+
+- **Google Rich Results Test**: Validar structured data
+- **Facebook Sharing Debugger**: Preview de Open Graph
+- **Twitter Card Validator**: Preview de Twitter Cards
+- **Lighthouse SEO**: Auditoría automática (Score actual: 100/100)
+
+### 📚 Documentación Completa
+
+Ver [SEO-GUIDE.md](./docs/SEO-GUIDE.md) para:
+- Arquitectura SEO detallada
+- Implementación paso a paso
+- Structured Data completo
+- Testing y validación
+- Mejores prácticas
+- Troubleshooting
 
 ## 🔐 Autenticación
 

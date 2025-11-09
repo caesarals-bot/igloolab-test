@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { productsService, type CreateProductDTO, type UpdateProductDTO } from '@/lib/api'
 import type { Product } from '@/types'
+import { mockProducts } from '@/data/mockData'
 
 interface ProductsContextType {
   // State
@@ -57,12 +58,69 @@ export const ProductsProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       setLoading(true)
       setError(null)
+      
+      // Intentar cargar desde API
       const data = await productsService.getAll(params)
       setProducts(data.products)
       setPagination(data.pagination)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar productos')
-      console.error('Error fetching products:', err)
+      console.warn('Backend no disponible, usando mock data:', err.message)
+      
+      // Fallback a mock data si el backend no está disponible
+      const limit = params?.limit || 10
+      const page = params?.page || 1
+      const startIndex = (page - 1) * limit
+      const endIndex = startIndex + limit
+      
+      let filteredProducts = [...mockProducts]
+      
+      // Aplicar búsqueda si existe
+      if (params?.search) {
+        const searchLower = params.search.toLowerCase()
+        filteredProducts = filteredProducts.filter(p => 
+          p.nombre.toLowerCase().includes(searchLower) ||
+          p.descripcion.toLowerCase().includes(searchLower)
+        )
+      }
+      
+      // Aplicar ordenamiento
+      if (params?.sortBy && params.sortBy !== 'createdAt') {
+        filteredProducts.sort((a, b) => {
+          let aVal: any
+          let bVal: any
+          
+          if (params.sortBy === 'nombre' || params.sortBy === 'fechaElaboracion' || params.sortBy === 'fechaVencimiento') {
+            aVal = a[params.sortBy]
+            bVal = b[params.sortBy]
+          } else if (params.sortBy === 'precio') {
+            aVal = a.precio
+            bVal = b.precio
+          }
+          
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return params.order === 'desc' 
+              ? bVal.localeCompare(aVal)
+              : aVal.localeCompare(bVal)
+          }
+          if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return params.order === 'desc' ? bVal - aVal : aVal - bVal
+          }
+          return 0
+        })
+      }
+      
+      const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+      
+      setProducts(paginatedProducts)
+      setPagination({
+        total: filteredProducts.length,
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(filteredProducts.length / limit),
+      })
+      
+      // Mostrar advertencia suave (no error)
+      setError('⚠️ Usando datos de demostración (backend no conectado)')
     } finally {
       setLoading(false)
     }

@@ -104,17 +104,36 @@ export default function MedicationsPage() {
           </div>
         </div>
 
-        {/* Error State */}
+        {/* Error/Warning State */}
         {error && !loading && (
-          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-destructive">Error al cargar productos</p>
-                <p className="text-sm text-destructive/80 mt-1">{error}</p>
+          <div className={error.includes('demostración') 
+            ? "rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 p-4"
+            : "rounded-lg border border-destructive/50 bg-destructive/10 p-4"
+          }>
+            <div className="flex items-start gap-3">
+              {error.includes('demostración') && <span className="text-2xl">⚠️</span>}
+              <div className="flex-1">
+                <p className={`font-medium ${error.includes('demostración') 
+                  ? 'text-amber-800 dark:text-amber-200' 
+                  : 'text-destructive'}`}>
+                  {error.includes('demostración') ? 'Modo demostración' : 'Error al cargar productos'}
+                </p>
+                <p className={`text-sm mt-1 ${error.includes('demostración') 
+                  ? 'text-amber-700 dark:text-amber-300' 
+                  : 'text-destructive/80'}`}>
+                  {error}
+                </p>
+                {error.includes('demostración') && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                    💡 Inicia el backend en <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded">http://localhost:3000</code> para usar datos reales
+                  </p>
+                )}
               </div>
-              <Button variant="outline" size="sm" onClick={handleRefresh}>
-                Reintentar
-              </Button>
+              {!error.includes('demostración') && (
+                <Button variant="outline" size="sm" onClick={handleRefresh}>
+                  Reintentar
+                </Button>
+              )}
             </div>
           </div>
         )}
@@ -146,7 +165,7 @@ export default function MedicationsPage() {
           )}
 
           {/* Empty State */}
-          {!loading && products.length === 0 && !error && (
+          {!loading && products.length === 0 && !error?.includes('demostración') && (
             <div className="rounded-lg border border-border bg-card p-12 text-center">
               <p className="text-muted-foreground">No hay productos en el inventario</p>
               <Button className="mt-4" onClick={handleAddProduct}>

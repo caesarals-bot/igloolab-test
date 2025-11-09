@@ -43,7 +43,7 @@ export function ProductDetailModal({ product, open, onOpenChange }: ProductDetai
           <div className="space-y-6">
             {/* Precio destacado */}
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-primary">${product.precio.toFixed(2)}</span>
+              <span className="text-4xl font-bold text-primary">${Number(product.precio).toFixed(2)}</span>
               <Badge variant="secondary" className="text-xs">
                 Precio unitario
               </Badge>

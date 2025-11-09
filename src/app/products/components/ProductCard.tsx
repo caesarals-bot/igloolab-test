@@ -21,7 +21,7 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
         <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-1">{product.nombre}</h3>
         <p className="text-sm text-muted-foreground line-clamp-1 mb-3">{product.descripcion}</p>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-primary">${product.precio.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-primary">${Number(product.precio).toFixed(2)}</span>
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">

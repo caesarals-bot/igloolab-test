@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { dashboardService, type DashboardStats, type ExpiryStatus } from '@/lib/api'
+import { mockProducts } from '@/data/mockData'
 
 interface DashboardContextType {
   // State
@@ -32,8 +33,45 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       const data = await dashboardService.getStats()
       setStats(data)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar estadísticas')
-      console.error('Error fetching dashboard stats:', err)
+      console.warn('Backend no disponible, calculando stats desde mock data:', err.message)
+      
+      // Calcular stats desde mockProducts
+      const totalProducts = mockProducts.length
+      const totalInventoryValue = mockProducts.reduce((sum, p) => sum + Number(p.precio), 0)
+      const averagePrice = totalInventoryValue / totalProducts
+      
+      // Calcular productos por vencer (próximos 30 días)
+      const now = new Date()
+      const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      const expiringProducts = mockProducts.filter(p => {
+        const expiryDate = new Date(p.fechaVencimiento)
+        return expiryDate <= thirtyDaysFromNow && expiryDate >= now
+      }).length
+      
+      const mockStats: DashboardStats = {
+        totalProducts,
+        totalInventoryValue,
+        averagePrice,
+        expiringProducts,
+        expiringProductsList: mockProducts
+          .filter(p => {
+            const expiryDate = new Date(p.fechaVencimiento)
+            return expiryDate <= thirtyDaysFromNow && expiryDate >= now
+          })
+          .map(p => {
+            const expiryDate = new Date(p.fechaVencimiento)
+            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+            return {
+              id: p.id,
+              nombre: p.nombre,
+              fechaVencimiento: p.fechaVencimiento,
+              daysUntilExpiry
+            }
+          })
+      }
+      
+      setStats(mockStats)
+      setError('⚠️ Usando datos de demostración (backend no conectado)')
     } finally {
       setLoading(false)
     }

@@ -32,11 +32,11 @@ export function ProductTable({ products, onEdit, onRefresh }: ProductTableProps)
     return format(new Date(dateString), "dd MMM yyyy", { locale: es })
   }
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | string) => {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "USD",
-    }).format(price)
+    }).format(Number(price))
   }
 
   const handleEdit = (product: Product) => {

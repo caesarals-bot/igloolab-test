@@ -3,6 +3,7 @@ import { useDashboardContext } from "@/context"
 import { Package, DollarSign, AlertTriangle, TrendingUp, RefreshCw } from "lucide-react"
 import { Link } from "react-router"
 import { Button } from "@/components/ui/button"
+import { SEO } from "@/components/seo/SEO"
 
 export default function DashboardPage() {
   const { stats, loading, error, fetchStats, refreshDashboard } = useDashboardContext()
@@ -16,19 +17,26 @@ export default function DashboardPage() {
   // Skeleton loader
   if (loading && !stats) {
     return (
-      <div className="space-y-8">
-        <div>
-          <div className="h-9 w-48 bg-muted animate-pulse rounded"></div>
-          <div className="h-5 w-96 bg-muted animate-pulse rounded mt-2"></div>
+      <>
+        <SEO
+          title="Dashboard - Panel de Administración"
+          description="Panel de control administrativo de igloolab"
+          noindex={true}
+        />
+        <div className="space-y-8">
+          <div>
+            <div className="h-9 w-48 bg-muted animate-pulse rounded"></div>
+            <div className="h-5 w-96 bg-muted animate-pulse rounded mt-2"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-lg border border-border bg-card p-6">
+                <div className="h-20 bg-muted animate-pulse rounded"></div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="rounded-lg border border-border bg-card p-6">
-              <div className="h-20 bg-muted animate-pulse rounded"></div>
-            </div>
-          ))}
-        </div>
-      </div>
+      </>
     )
   }
 
@@ -85,15 +93,21 @@ export default function DashboardPage() {
   ] : []
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Bienvenido al panel de administración de igloolab
-          </p>
-        </div>
+    <>
+      <SEO
+        title="Dashboard - Panel de Administración"
+        description="Panel de control administrativo de igloolab"
+        noindex={true}
+      />
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-1">
+              Bienvenido al panel de administración de igloolab
+            </p>
+          </div>
         <Button
           onClick={() => refreshDashboard()}
           variant="outline"
@@ -219,5 +233,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }

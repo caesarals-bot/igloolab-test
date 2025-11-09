@@ -4,6 +4,7 @@ import type { Product } from "@/types"
 import { ProductCard } from "./components/ProductCard"
 import { ProductDetailModal } from "./components/ProductDetailModal"
 import HeroProducts from "./components/HeroProducts"
+import { SEO } from "@/components/seo/SEO"
 
 export default function ProductosPage() {
   const { products, loading, error, fetchProducts } = useProductsContext()
@@ -22,6 +23,35 @@ export default function ProductosPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Productos Farmacéuticos - Catálogo Completo"
+        description="Explora nuestro catálogo completo de productos farmacéuticos. Medicamentos, tratamientos y soluciones para profesionales de la salud."
+        keywords="productos farmacéuticos, medicamentos, catálogo médico, tratamientos, soluciones de salud"
+        url="https://igloolab.co/productos"
+        type="website"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "Productos Farmacéuticos",
+          "description": "Catálogo de productos farmacéuticos",
+          "numberOfItems": products.length,
+          "itemListElement": products.slice(0, 10).map((product, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "Product",
+              "name": product.nombre,
+              "description": product.descripcion,
+              "offers": {
+                "@type": "Offer",
+                "price": product.precio,
+                "priceCurrency": "USD"
+              }
+            }
+          }))
+        }}
+      />
+      
       {/* Hero Section */}
       <HeroProducts />
 
@@ -36,24 +66,41 @@ export default function ProductosPage() {
             </div>
           )}
 
-          {/* Error State */}
+          {/* Warning/Error State */}
           {error && !loading && (
-            <div className="text-center py-12">
-              <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg max-w-md mx-auto">
-                <p className="font-medium">Error al cargar productos</p>
-                <p className="text-sm mt-1">{error}</p>
-                <button 
-                  onClick={() => fetchProducts({ limit: 20 })}
-                  className="mt-3 text-sm underline"
-                >
-                  Intentar de nuevo
-                </button>
-              </div>
+            <div className="mb-6">
+              {error.includes('demostración') ? (
+                // Warning suave para mock data
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg max-w-3xl mx-auto">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">⚠️</span>
+                    <div className="flex-1">
+                      <p className="font-medium">Modo demostración</p>
+                      <p className="text-sm mt-1">
+                        El backend no está disponible. Mostrando datos de ejemplo. 
+                        Para usar datos reales, inicia el servidor backend en <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded">http://localhost:3000</code>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Error real
+                <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg max-w-md mx-auto text-center">
+                  <p className="font-medium">Error al cargar productos</p>
+                  <p className="text-sm mt-1">{error}</p>
+                  <button 
+                    onClick={() => fetchProducts({ limit: 20 })}
+                    className="mt-3 text-sm underline"
+                  >
+                    Intentar de nuevo
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {/* Products Grid */}
-          {!loading && !error && products.length > 0 && (
+          {!loading && products.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} onViewDetails={handleViewDetails} />
@@ -62,7 +109,7 @@ export default function ProductosPage() {
           )}
 
           {/* Empty State */}
-          {!loading && !error && products.length === 0 && (
+          {!loading && products.length === 0 && !error?.includes('demostración') && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No hay productos disponibles</p>
             </div>
