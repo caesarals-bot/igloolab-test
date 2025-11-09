@@ -1,8 +1,10 @@
+import { Suspense, useState } from "react"
 import { Outlet, Link, useLocation } from "react-router"
 import { Pill, LayoutDashboard, Package, Settings, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { mockUser } from "@/data/mockData"
-import { useState } from "react"
+import { DashboardSkeleton } from "@/components/common/PageSkeleton"
+import { ErrorBoundary } from "@/components/common/ErrorBoundary"
 
 const AdminLayout = () => {
     const location = useLocation()
@@ -125,7 +127,11 @@ const AdminLayout = () => {
 
                 {/* Page Content */}
                 <main className="p-4 md:p-8">
-                    <Outlet />
+                    <ErrorBoundary>
+                        <Suspense fallback={<DashboardSkeleton />}>
+                            <Outlet />
+                        </Suspense>
+                    </ErrorBoundary>
                 </main>
             </div>
         </div>

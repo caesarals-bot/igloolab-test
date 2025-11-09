@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import { useProductsContext, useDashboardContext } from "@/context"
 import { Button } from "@/components/ui/button"
 import { Plus, RefreshCw } from "lucide-react"
 import { ProductTable } from "../components/ProductTable"
-import { ProductForm } from "../components/ProductForm"
+import { FormSkeleton } from "@/components/common/PageSkeleton"
 import type { Product } from "@/types"
+
+// Lazy load ProductForm (componente pesado ~21KB)
+const ProductForm = lazy(() => import("../components/ProductForm").then(module => ({ 
+  default: module.ProductForm 
+})))
 
 export default function MedicationsPage() {
   const { products, loading, error, fetchProducts } = useProductsContext()
@@ -154,12 +159,14 @@ export default function MedicationsPage() {
       </div>
 
       {/* Product Form Sheet */}
-      <ProductForm 
-        productToEdit={productToEdit} 
-        open={isFormOpen} 
-        onOpenChange={setIsFormOpen}
-        onSuccess={handleFormSuccess}
-      />
+      <Suspense fallback={<FormSkeleton />}>
+        <ProductForm 
+          productToEdit={productToEdit} 
+          open={isFormOpen} 
+          onOpenChange={setIsFormOpen}
+          onSuccess={handleFormSuccess}
+        />
+      </Suspense>
     </>
   )
 }

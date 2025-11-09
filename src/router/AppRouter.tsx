@@ -1,13 +1,22 @@
+import { lazy } from "react"
 import { createBrowserRouter } from "react-router"
+
+// Layouts cargados síncronamente (necesarios para la estructura)
 import LayoutPage from "../app/layout/LayoutPage"
-import HomePage from "../app/home/HomePage"
-import ProductosPage from "../app/products/ProductsPage"
 import AdminLayout from "../admin/layout/AdminLayout"
-import DashboardPage from "../admin/page/DashboardPage"
-import MedicationsPage from "../admin/page/MedicationsPage"
-import SettingsPage from "../admin/page/SettingsPage"
-import LoginPage from "../auth/LoginPage"
-import RegisterPage from "../auth/RegisterPage"
+
+// Páginas públicas - lazy loading
+const HomePage = lazy(() => import("../app/home/HomePage"))
+const ProductosPage = lazy(() => import("../app/products/ProductsPage"))
+
+// Páginas de autenticación - lazy loading
+const LoginPage = lazy(() => import("../auth/LoginPage"))
+const RegisterPage = lazy(() => import("../auth/RegisterPage"))
+
+// Páginas de administración - lazy loading (prioridad alta)
+const DashboardPage = lazy(() => import("../admin/page/DashboardPage"))
+const MedicationsPage = lazy(() => import("../admin/page/MedicationsPage"))
+const SettingsPage = lazy(() => import("../admin/page/SettingsPage"))
 
 const AppRouter = createBrowserRouter([
     {
