@@ -1,14 +1,21 @@
 import { Suspense, useState } from "react"
-import { Outlet, Link, useLocation } from "react-router"
-import { Pill, LayoutDashboard, Package, Settings, LogOut, Menu, X } from "lucide-react"
+import { Outlet, Link, useLocation, useNavigate } from "react-router"
+import { Pill, LayoutDashboard, Package, Settings, LogOut, Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { mockUser } from "@/data/mockData"
 import { DashboardSkeleton } from "@/components/common/PageSkeleton"
 import { ErrorBoundary } from "@/components/common/ErrorBoundary"
+import { useAuthContext } from "@/context"
 
 const AdminLayout = () => {
     const location = useLocation()
+    const navigate = useNavigate()
+    const { user, logout } = useAuthContext()
     const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    const handleLogout = () => {
+        logout()
+        navigate("/login")
+    }
 
     const navigation = [
         { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -52,21 +59,6 @@ const AdminLayout = () => {
                         </Button>
                     </div>
 
-                    {/* User Info */}
-                    <div className="p-4 border-b border-border">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span className="text-sm font-medium text-primary">
-                                    {mockUser.nombre.charAt(0)}
-                                </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground truncate">{mockUser.nombre}</p>
-                                <p className="text-xs text-muted-foreground truncate">{mockUser.email}</p>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Navigation */}
                     <nav className="flex-1 p-4 space-y-2">
                         {navigation.map((item) => {
@@ -88,15 +80,23 @@ const AdminLayout = () => {
                         })}
                     </nav>
 
-                    {/* Logout Button */}
-                    <div className="p-4 border-t border-border">
+                    {/* User Info & Logout */}
+                    <div className="p-4 border-t border-border space-y-3">
+                        {user && (
+                            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+                                    <User className="w-4 h-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground truncate">{user.nombre}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                </div>
+                            </div>
+                        )}
                         <Button
                             variant="ghost"
                             className="w-full justify-start gap-3 text-base"
-                            onClick={() => {
-                                // Handle logout
-                                console.log("Logout")
-                            }}
+                            onClick={handleLogout}
                         >
                             <LogOut className="w-5 h-5" />
                             Cerrar Sesión

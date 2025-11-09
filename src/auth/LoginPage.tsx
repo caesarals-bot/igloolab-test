@@ -1,18 +1,27 @@
-
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useNavigate } from "react-router"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
+import { useAuthContext } from '@/context'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { login, loading, error } = useAuthContext()
+  
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simular login y redirigir al admin
-    navigate("/admin/dashboard")
+    
+    const success = await login({ email, password })
+    
+    if (success) {
+      navigate("/admin/dashboard")
+    }
   }
 
   return (
@@ -34,11 +43,25 @@ export default function LoginPage() {
             <CardDescription>Ingresa tus credenciales para acceder a la plataforma</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {error && (
+              <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo Electrónico</Label>
-                  <Input id="email" type="email" placeholder="tu@email.com" required />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="tu@email.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -48,12 +71,27 @@ export default function LoginPage() {
                       ¿Olvidaste tu contraseña?
                     </Link>
                   </div>
-                  <Input id="password" type="password" placeholder="••••••••" required />
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    placeholder="••••••••" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    required 
+                  />
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
-                Iniciar Sesión
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Iniciando sesión...
+                  </>
+                ) : (
+                  'Iniciar Sesión'
+                )}
               </Button>
             </form>
 

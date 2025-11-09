@@ -9,37 +9,108 @@ const apiClient = axios.create({
   timeout: 10000, // 10 segundos
 })
 
-// Request interceptor (para agregar token después cuando se implemente auth)
+// Request interceptor - Agregar token JWT automáticamente
 apiClient.interceptors.request.use(
   (config) => {
-    // Futuro: agregar token JWT aquí
-    // const token = localStorage.getItem('token')
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   (error) => Promise.reject(error)
 )
 
-// Response interceptor (manejo de errores global)
+// Variable para evitar múltiples refresh simultáneos
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (value: unknown) => void
+  reject: (reason?: unknown) => void
+}> = []
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+// Response interceptor - Auto-refresh de tokens y manejo de errores
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<APIError>) => {
+  async (error: AxiosError<APIError>) => {
+    const originalRequest = error.config
+
     if (error.response) {
-      // Error del servidor (4xx, 5xx)
-      console.error('API Error:', error.response.data)
-      
-      // Manejar errores específicos
-      if (error.response.status === 401) {
-        // Futuro: redirect a login cuando se implemente auth
-        // window.location.href = '/login'
+      // Error 401: Token expirado, intentar refresh
+      if (error.response.status === 401 && originalRequest && !originalRequest.url?.includes('/auth/')) {
+        if (isRefreshing) {
+          // Si ya se está refrescando, agregar a la cola
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject })
+          }).then(token => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`
+            }
+            return apiClient(originalRequest)
+          }).catch(err => Promise.reject(err))
+        }
+
+        isRefreshing = true
+
+        const refreshToken = localStorage.getItem('refreshToken')
+        if (!refreshToken) {
+          // No hay refresh token, redirect a login
+          processQueue(error, null)
+          isRefreshing = false
+          localStorage.clear()
+          window.location.href = '/login'
+          return Promise.reject(error)
+        }
+
+        try {
+          // Intentar refrescar el token
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/refresh`,
+            { refreshToken }
+          )
+
+          const { accessToken, refreshToken: newRefreshToken } = response.data
+
+          // Guardar nuevos tokens
+          localStorage.setItem('accessToken', accessToken)
+          localStorage.setItem('refreshToken', newRefreshToken)
+
+          // Actualizar header del request original
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`
+          }
+
+          // Procesar la cola de requests fallidos
+          processQueue(null, accessToken)
+
+          // Reintentar el request original
+          return apiClient(originalRequest)
+        } catch (refreshError) {
+          // Refresh falló, limpiar todo y redirect a login
+          processQueue(refreshError, null)
+          localStorage.clear()
+          window.location.href = '/login'
+          return Promise.reject(refreshError)
+        } finally {
+          isRefreshing = false
+        }
       }
+
+      // Otros errores
+      console.error('API Error:', error.response.data)
     } else if (error.request) {
-      // Request hecho pero sin respuesta
       console.error('Network Error:', error.message)
     } else {
-      // Otro tipo de error
       console.error('Error:', error.message)
     }
     
