@@ -1,17 +1,14 @@
 import { Suspense } from "react"
 import { Outlet } from "react-router"
 import { Navbar } from "../components/navbar/Navbar"
-import { mockUser } from "@/data/mockData"
 import Footer from "../components/footer/Footer"
 import { PageLoader } from "@/components/common/PageLoader"
 import { ErrorBoundary } from "@/components/common/ErrorBoundary"
+import { useAuthContext } from "@/context"
 
 const LayoutPage = () => {
-    // MODO DESARROLLO: Cambiar isAuthenticated para alternar entre estados
-    // true = modo autenticado (muestra Dashboard y usuario)
-    // false = modo público (muestra Home, Productos, Login)
-    const isAuthenticated = true
-    const user = isAuthenticated ? mockUser : null
+    // Obtener usuario autenticado del AuthContext
+    const { user } = useAuthContext()
 
     return (
         <div className="min-h-screen flex flex-col">

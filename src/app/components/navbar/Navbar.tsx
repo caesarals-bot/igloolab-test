@@ -1,14 +1,21 @@
-
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
 import { LogOut, Pill } from "lucide-react"
 import type { User } from "@/types"
+import { useAuthContext } from "@/context"
 
 interface NavbarProps {
   user: User | null
 }
 
 export function Navbar({ user }: NavbarProps) {
+  const navigate = useNavigate()
+  const { logout } = useAuthContext()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/login")
+  }
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -47,7 +54,12 @@ export function Navbar({ user }: NavbarProps) {
                 <span className="text-base text-muted-foreground hidden sm:inline-block">
                   <span className="font-medium text-foreground">{user.nombre}</span>
                 </span>
-                <Button variant="ghost" size="sm" className="gap-2 text-base">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-base"
+                  onClick={handleLogout}
+                >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden sm:inline-block">Cerrar Sesión</span>
                 </Button>
