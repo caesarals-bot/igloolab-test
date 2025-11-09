@@ -8,6 +8,15 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onViewDetails }: ProductCardProps) {
+  const formatPrice = (price: number | string) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(price))
+  }
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
       <div className="relative aspect-square overflow-hidden bg-muted">
@@ -21,7 +30,7 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
         <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-1">{product.nombre}</h3>
         <p className="text-sm text-muted-foreground line-clamp-1 mb-3">{product.descripcion}</p>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-primary">${Number(product.precio).toFixed(2)}</span>
+          <span className="text-2xl font-bold text-primary">{formatPrice(product.precio)}</span>
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">

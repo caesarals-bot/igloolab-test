@@ -14,11 +14,19 @@ export function ProductDetailModal({ product, open, onOpenChange }: ProductDetai
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+    const day = date.getDate()
+    const month = date.toLocaleDateString("es-ES", { month: "short" })
+    const year = date.getFullYear()
+    return `${day} de ${month} de ${year}`
+  }
+
+  const formatPrice = (price: number | string) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(price))
   }
 
   return (
@@ -42,9 +50,11 @@ export function ProductDetailModal({ product, open, onOpenChange }: ProductDetai
           {/* Información del producto */}
           <div className="space-y-6">
             {/* Precio destacado */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-primary">${Number(product.precio).toFixed(2)}</span>
-              <Badge variant="secondary" className="text-xs">
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-primary">{formatPrice(product.precio)}</span>
+              </div>
+              <Badge variant="secondary" className="text-xs w-fit">
                 Precio unitario
               </Badge>
             </div>
@@ -80,8 +90,11 @@ export function ProductDetailModal({ product, open, onOpenChange }: ProductDetai
 
             {/* ID del producto */}
             <div className="pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                ID del producto: <span className="font-mono font-medium">{product.id}</span>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span>SKU:</span>
+                <span className="font-mono font-medium text-foreground">
+                  {product.id.slice(0, 8).toUpperCase()}
+                </span>
               </p>
             </div>
           </div>

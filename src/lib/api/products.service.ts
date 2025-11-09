@@ -23,7 +23,7 @@ export type CreateProductDTO = {
   descripcion: string
   fechaElaboracion: string
   fechaVencimiento: string
-  imagen?: string
+  imageUrl?: string
 }
 
 export type UpdateProductDTO = {
@@ -32,7 +32,7 @@ export type UpdateProductDTO = {
   descripcion?: string
   fechaElaboracion?: string
   fechaVencimiento?: string
-  imagen?: string
+  imageUrl?: string
 }
 
 export const productsService = {

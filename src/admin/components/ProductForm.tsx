@@ -115,7 +115,23 @@ export function ProductForm({ productToEdit, open, onOpenChange, onSuccess }: Pr
 
   const handleImageUrlChange = (url: string) => {
     setImageUrl(url)
-    setImagePreview(url || null)
+    
+    // Validar URL básica
+    if (url) {
+      try {
+        new URL(url)
+        setImagePreview(url)
+        setFormError(null)
+      } catch {
+        setImagePreview(null)
+        if (url.length > 10) { // Solo mostrar error si ya escribió algo
+          setFormError('Por favor ingresa una URL válida (debe comenzar con http:// o https://)')
+        }
+      }
+    } else {
+      setImagePreview(null)
+      setFormError(null)
+    }
   }
 
   const clearImage = () => {
@@ -379,7 +395,9 @@ export function ProductForm({ productToEdit, open, onOpenChange, onSuccess }: Pr
                   </Card>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Ingresa la URL completa de una imagen existente
+                  💡 Ingresa la URL completa (ej: https://ejemplo.com/imagen.jpg)
+                  <br />
+                  Puedes usar servicios como Cloudinary, Imgur, o cualquier URL pública
                 </p>
               </div>
             )}
