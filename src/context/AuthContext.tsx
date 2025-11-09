@@ -42,29 +42,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null)
 
       const accessToken = localStorage.getItem('accessToken')
-      if (!accessToken) {
+      const refreshToken = localStorage.getItem('refreshToken')
+      
+      if (!accessToken || !refreshToken) {
         setUser(null)
         return
       }
 
-      // Obtener usuario actual
+      // Obtener usuario actual (el interceptor manejará el refresh si es necesario)
       const userData = await authService.me()
       setUser(userData)
     } catch (err: any) {
-      console.error('Auth check failed:', err)
+      // Si falla, simplemente no hay sesión válida
+      // No es un error, es un estado normal
       setUser(null)
       // Limpiar tokens si falló la verificación
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
     } finally {
       setLoading(false)
     }
   }, [])
 
-  // Verificar auth al montar
+  // Verificar auth al montar (solo una vez)
   useEffect(() => {
     checkAuth()
-  }, [checkAuth])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Login
   const login = useCallback(async (data: LoginData): Promise<boolean> => {

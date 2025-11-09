@@ -1,9 +1,10 @@
 import { useEffect } from "react"
 import { useDashboardContext } from "@/context"
-import { Package, DollarSign, AlertTriangle, TrendingUp, RefreshCw } from "lucide-react"
+import { Package, DollarSign, AlertTriangle, TrendingUp, RefreshCw, XCircle } from "lucide-react"
 import { Link } from "react-router"
 import { Button } from "@/components/ui/button"
 import { SEO } from "@/components/seo/SEO"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function DashboardPage() {
   const { stats, loading, error, fetchStats, refreshDashboard } = useDashboardContext()
@@ -79,16 +80,16 @@ export default function DashboardPage() {
       color: "text-green-600 bg-green-100",
     },
     {
+      name: "Vencidos",
+      value: stats.expiredProducts,
+      icon: XCircle,
+      color: "text-red-600 bg-red-100",
+    },
+    {
       name: "Por Vencer (30 días)",
       value: stats.expiringProducts,
       icon: AlertTriangle,
       color: "text-orange-600 bg-orange-100",
-    },
-    {
-      name: "Precio Promedio",
-      value: `$${stats.averagePrice.toLocaleString('es-CO', { minimumFractionDigits: 2 })}`,
-      icon: TrendingUp,
-      color: "text-purple-600 bg-purple-100",
     },
   ] : []
 
@@ -143,11 +144,54 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* Expiring Products List */}
+      {/* CRITICAL ALERT: Expired Products */}
+      {stats && stats.expiredProducts > 0 && (
+        <Alert variant="destructive" className="border-2">
+          <XCircle className="h-5 w-5" />
+          <AlertTitle className="text-lg font-bold">¡ALERTA CRÍTICA! Productos Vencidos</AlertTitle>
+          <AlertDescription>
+            <p className="mb-4">
+              Hay <strong>{stats.expiredProducts}</strong> producto{stats.expiredProducts !== 1 ? 's' : ''} que ya {stats.expiredProducts !== 1 ? 'han' : 'ha'} vencido. 
+              Estos productos NO deben ser utilizados ni vendidos.
+            </p>
+            <div className="space-y-2 bg-red-50 dark:bg-red-950/20 p-4 rounded-md">
+              {stats.expiredProductsList.map((product) => (
+                <div 
+                  key={product.id}
+                  className="flex items-center justify-between py-2 border-b border-red-200 dark:border-red-800 last:border-0"
+                >
+                  <div className="space-y-1">
+                    <p className="font-bold text-red-900 dark:text-red-100">{product.nombre}</p>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      Venció: {new Date(product.fechaVencimiento).toLocaleDateString('es-CO')}
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-sm font-bold bg-red-600 text-white">
+                    {Math.abs(product.daysUntilExpiry)} días vencido
+                  </span>
+                </div>
+              ))}
+            </div>
+            <Link to="/admin/medications" className="mt-4 inline-block">
+              <Button variant="destructive" size="sm" className="gap-2">
+                <Package className="w-4 h-4" />
+                Revisar Inventario
+              </Button>
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* WARNING: Expiring Products List */}
       {stats && stats.expiringProductsList.length > 0 && (
-        <div className="rounded-lg border border-border bg-card p-6">
-          <h2 className="text-xl font-semibold mb-4">Productos Próximos a Vencer</h2>
-          <div className="space-y-3">
+        <Alert variant="default" className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/20">
+          <AlertTriangle className="h-5 w-5 text-orange-600" />
+          <AlertTitle className="text-lg font-bold text-orange-900 dark:text-orange-100">Productos Próximos a Vencer</AlertTitle>
+          <AlertDescription>
+            <p className="mb-4 text-orange-800 dark:text-orange-200">
+              {stats.expiringProducts} producto{stats.expiringProducts !== 1 ? 's' : ''} vencer{stats.expiringProducts !== 1 ? 'án' : 'á'} en los próximos 30 días.
+            </p>
+          <div className="space-y-2 bg-white dark:bg-gray-900 p-4 rounded-md">
             {stats.expiringProductsList.map((product) => (
               <div 
                 key={product.id}
@@ -171,7 +215,8 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
-        </div>
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Quick Actions */}

@@ -43,11 +43,17 @@ const processQueue = (error: unknown, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<APIError>) => {
-    const originalRequest = error.config
+    const originalRequest = error.config as any
 
     if (error.response) {
       // Error 401: Token expirado, intentar refresh
-      if (error.response.status === 401 && originalRequest && !originalRequest.url?.includes('/auth/')) {
+      // NO intentar refresh en login, register o refresh mismo
+      const skipRefreshUrls = ['/auth/login', '/auth/register', '/auth/refresh']
+      const shouldSkipRefresh = skipRefreshUrls.some(url => originalRequest?.url?.includes(url))
+      
+      // IMPORTANTE: Solo intentar refresh UNA VEZ por request
+      if (error.response.status === 401 && originalRequest && !shouldSkipRefresh && !originalRequest._retry) {
+        originalRequest._retry = true // Marcar para no reintentar
         if (isRefreshing) {
           // Si ya se está refrescando, agregar a la cola
           return new Promise((resolve, reject) => {
@@ -64,11 +70,12 @@ apiClient.interceptors.response.use(
 
         const refreshToken = localStorage.getItem('refreshToken')
         if (!refreshToken) {
-          // No hay refresh token, redirect a login
+          // No hay refresh token, limpiar y dejar que AuthContext maneje
           processQueue(error, null)
           isRefreshing = false
-          localStorage.clear()
-          window.location.href = '/login'
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('refreshToken')
+          localStorage.removeItem('user')
           return Promise.reject(error)
         }
 
@@ -96,10 +103,11 @@ apiClient.interceptors.response.use(
           // Reintentar el request original
           return apiClient(originalRequest)
         } catch (refreshError) {
-          // Refresh falló, limpiar todo y redirect a login
+          // Refresh falló, limpiar tokens y dejar que AuthContext maneje
           processQueue(refreshError, null)
-          localStorage.clear()
-          window.location.href = '/login'
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('refreshToken')
+          localStorage.removeItem('user')
           return Promise.reject(refreshError)
         } finally {
           isRefreshing = false

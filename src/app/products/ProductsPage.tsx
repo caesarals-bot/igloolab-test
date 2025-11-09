@@ -5,16 +5,29 @@ import { ProductCard } from "./components/ProductCard"
 import { ProductDetailModal } from "./components/ProductDetailModal"
 import HeroProducts from "./components/HeroProducts"
 import { SEO } from "@/components/seo/SEO"
+import { Input } from "@/components/ui/input"
+import { Search, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function ProductosPage() {
   const { products, loading, error, fetchProducts } = useProductsContext()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   // Fetch products on mount
   useEffect(() => {
     fetchProducts({ limit: 20 })
   }, [])
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProducts({ limit: 20, search: searchTerm })
+    }, 500) // Espera 500ms después de que el usuario deje de escribir
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   const handleViewDetails = (product: Product) => {
     setSelectedProduct(product)
@@ -58,6 +71,35 @@ export default function ProductosPage() {
       {/* Products Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
+          {/* Search Bar */}
+          <div className="mb-8 max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Buscar productos por nombre o descripción..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-10 h-12 text-base"
+              />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                  onClick={() => setSearchTerm("")}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            {searchTerm && (
+              <p className="text-sm text-muted-foreground mt-2 text-center">
+                {loading ? 'Buscando...' : `${products.length} producto${products.length !== 1 ? 's' : ''} encontrado${products.length !== 1 ? 's' : ''}`}
+              </p>
+            )}
+          </div>
+
           {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
@@ -109,9 +151,28 @@ export default function ProductosPage() {
           )}
 
           {/* Empty State */}
-          {!loading && products.length === 0 && !error?.includes('demostración') && (
+          {!loading && products.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No hay productos disponibles</p>
+              {searchTerm ? (
+                <div className="space-y-2">
+                  <p className="text-lg font-medium text-foreground">No se encontraron resultados</p>
+                  <p className="text-sm text-muted-foreground">
+                    No hay productos que coincidan con "{searchTerm}"
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSearchTerm("")}
+                    className="mt-4"
+                  >
+                    Limpiar búsqueda
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">
+                  {error?.includes('demostración') ? 'No hay productos en el catálogo' : 'No hay productos disponibles'}
+                </p>
+              )}
             </div>
           )}
         </div>

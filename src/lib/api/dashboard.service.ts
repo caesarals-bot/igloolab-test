@@ -5,6 +5,8 @@ export type DashboardStats = {
   totalProducts: number
   totalInventoryValue: number
   averagePrice: number
+  expiredProducts: number
+  expiredProductsList: ExpiringProduct[]
   expiringProducts: number
   expiringProductsList: ExpiringProduct[]
 }

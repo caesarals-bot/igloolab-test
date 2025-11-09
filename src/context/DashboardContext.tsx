@@ -40,34 +40,62 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       const totalInventoryValue = mockProducts.reduce((sum, p) => sum + Number(p.precio), 0)
       const averagePrice = totalInventoryValue / totalProducts
       
-      // Calcular productos por vencer (próximos 30 días)
+      // Calcular productos vencidos y por vencer
       const now = new Date()
       const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      
+      // Productos VENCIDOS (fecha < hoy)
+      const expiredProducts = mockProducts.filter(p => {
+        const expiryDate = new Date(p.fechaVencimiento)
+        return expiryDate < now
+      }).length
+      
+      const expiredProductsList = mockProducts
+        .filter(p => {
+          const expiryDate = new Date(p.fechaVencimiento)
+          return expiryDate < now
+        })
+        .map(p => {
+          const expiryDate = new Date(p.fechaVencimiento)
+          const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          return {
+            id: p.id,
+            nombre: p.nombre,
+            fechaVencimiento: p.fechaVencimiento,
+            daysUntilExpiry
+          }
+        })
+      
+      // Productos POR VENCER (próximos 30 días, pero NO vencidos)
       const expiringProducts = mockProducts.filter(p => {
         const expiryDate = new Date(p.fechaVencimiento)
         return expiryDate <= thirtyDaysFromNow && expiryDate >= now
       }).length
       
+      const expiringProductsList = mockProducts
+        .filter(p => {
+          const expiryDate = new Date(p.fechaVencimiento)
+          return expiryDate <= thirtyDaysFromNow && expiryDate >= now
+        })
+        .map(p => {
+          const expiryDate = new Date(p.fechaVencimiento)
+          const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          return {
+            id: p.id,
+            nombre: p.nombre,
+            fechaVencimiento: p.fechaVencimiento,
+            daysUntilExpiry
+          }
+        })
+      
       const mockStats: DashboardStats = {
         totalProducts,
         totalInventoryValue,
         averagePrice,
+        expiredProducts,
+        expiredProductsList,
         expiringProducts,
-        expiringProductsList: mockProducts
-          .filter(p => {
-            const expiryDate = new Date(p.fechaVencimiento)
-            return expiryDate <= thirtyDaysFromNow && expiryDate >= now
-          })
-          .map(p => {
-            const expiryDate = new Date(p.fechaVencimiento)
-            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-            return {
-              id: p.id,
-              nombre: p.nombre,
-              fechaVencimiento: p.fechaVencimiento,
-              daysUntilExpiry
-            }
-          })
+        expiringProductsList
       }
       
       setStats(mockStats)
