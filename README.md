@@ -29,15 +29,18 @@
 
 ### Público
 - **🏠 Landing Page** - Hero atractivo con animaciones y CTA
-- **💊 Catálogo de Productos** - Grid responsive con modal de detalles
-- **🖼️ Imágenes Optimizadas** - Assets con optimización automática de Vite
+- **💊 Catálogo de Productos** - Grid responsive con cards animados
+- **📄 Modal de Detalles** - Información completa con formato de precio COP
+- **🖼️ Imágenes Optimizadas** - Assets .webp con lazy loading
+- **💰 Formato de Precios** - Intl.NumberFormat con pesos colombianos
 
 ### Administración
 - **📊 Dashboard Completo** - Estadísticas en tiempo real y acciones rápidas
 - **📦 Gestión de Medicamentos** - CRUD completo con API REST integrada
-- **🖼️ Gestión de Imágenes** - Upload con optimización automática (Cloudinary ready)
+- **🖼️ Gestión de Imágenes** - Upload con optimización automática + URL externa
 - **🎛️ Panel de Configuración** - Ajustes de perfil y sistema
 - **🗂️ Sidebar Navegable** - Menú lateral colapsable con estados activos
+- **🔄 Modo Demostración** - Fallback inteligente a mock data si backend offline
 
 ### Técnico
 - **🔒 Seguridad Documentada** - Guía completa de implementación (AUTHENTICATION.md)
@@ -110,10 +113,14 @@ igloolab-project/
 │   ├── assets/              # Imágenes (.webp)
 │   └── lib/                 # Utilidades
 ├── docs/                    # Documentación adicional
-│   ├── CLOUDINARY-SETUP.md  # Guía de configuración de Cloudinary
-│   ├── CONTEXT-API-GUIDE.md # Guía de Context API
+│   ├── BACKEND-CHANGES.md    # Cambios necesarios en el backend
+│   ├── CLOUDINARY-SETUP.md   # Guía de configuración de Cloudinary
+│   ├── CONTEXT-API-GUIDE.md  # Guía de Context API
+│   ├── IMAGES-GUIDE.md       # Sistema completo de imágenes
 │   ├── LAZY-LOADING-GUIDE.md # Guía de optimización de performance
-│   └── SEO-GUIDE.md         # Guía completa de SEO
+│   ├── MIGRATION-IMAGEURL.md # Migración imagen → imageUrl
+│   ├── SEO-GUIDE.md          # Guía completa de SEO
+│   └── TEST-IMAGE-URL.md     # Diagnóstico de imágenes
 ├── AGENT.md                 # Guía de desarrollo
 ├── AUTHENTICATION.md        # Guía de seguridad
 ├── CHANGELOG.md             # Registro de cambios
@@ -197,19 +204,80 @@ GET    /api/dashboard      # Estadísticas
 
 Gestión de estado global con Context API:
 
-- **ProductsContext** - CRUD de productos
-- **DashboardContext** - Estadísticas y métricas
+- **ProductsContext** - CRUD de productos con fallback a mock data
+- **DashboardContext** - Estadísticas y métricas calculadas en tiempo real
 
 Ver [CONTEXT-API-GUIDE.md](./docs/CONTEXT-API-GUIDE.md) para más detalles.
 
+### 🔄 Modo Demostración (Sin Backend)
+
+El frontend funciona completamente sin backend gracias a un sistema de fallback inteligente:
+
+#### **Características del Modo Demo**
+
+- ✅ **5 productos de ejemplo** con imágenes reales
+- ✅ **Stats calculados dinámicamente** desde mock data
+- ✅ **CRUD funcional** (cambios solo en memoria)
+- ✅ **Búsqueda y ordenamiento** operativos
+- ✅ **Paginación funcional**
+- ⚠️ **Banner informativo** que indica modo demostración
+- 💡 **Instrucciones claras** para conectar backend
+
+#### **Cómo Funciona**
+
+```typescript
+// ProductsContext intenta conectar al backend
+try {
+  const data = await productsService.getAll(params)
+  setProducts(data.products)
+} catch (error) {
+  // Si falla, usa mock data automáticamente
+  console.warn('Backend no disponible, usando mock data')
+  setProducts(mockProducts)
+  setError('⚠️ Usando datos de demostración')
+}
+```
+
+#### **Beneficios**
+
+- 🚀 **Deploy inmediato** sin necesidad de backend
+- 🎨 **Testing de UI** sin configuración
+- 📱 **Demos rápidos** para stakeholders
+- 🔧 **Desarrollo frontend** independiente
+
 ### Gestión de Imágenes
 
-Soporte para dos métodos de imágenes:
+Sistema completo de gestión de imágenes con soporte dual:
 
-1. **Base64** (actual) - Para desarrollo y MVP
-2. **Cloudinary** (recomendado) - Para producción escalable
+#### 🖼️ **Métodos Soportados**
 
-Ver [CLOUDINARY-SETUP.md](./docs/CLOUDINARY-SETUP.md) para configuración.
+1. **📤 Subir Archivo (Recomendado)**
+   - Optimización automática (resize a 800x800px)
+   - Compresión JPEG 85% calidad
+   - Conversión a Base64
+   - Límite: 5MB
+   - Preview instantáneo
+
+2. **🔗 URL Externa**
+   - Soporte para CDN (Cloudinary, Imgur, etc.)
+   - Sin límite de tamaño
+   - Validación de formato
+   - Lazy loading automático
+
+#### ⚙️ **Características Técnicas**
+
+- Campo unificado: `imageUrl` (soporta URL o Base64)
+- Payload limit: 10MB para Base64
+- Validación automática de formato
+- Fallback a placeholder si falla
+- Error handling con mensajes claros
+
+#### 📚 **Documentación**
+
+- [IMAGES-GUIDE.md](./docs/IMAGES-GUIDE.md) - Guía completa del sistema
+- [CLOUDINARY-SETUP.md](./docs/CLOUDINARY-SETUP.md) - Integración con Cloudinary
+- [MIGRATION-IMAGEURL.md](./docs/MIGRATION-IMAGEURL.md) - Migración backend
+- [TEST-IMAGE-URL.md](./docs/TEST-IMAGE-URL.md) - Diagnóstico y testing
 
 ## ⚡ Performance y Optimización
 
@@ -231,10 +299,13 @@ El proyecto implementa técnicas avanzadas de optimización:
 
 | Métrica | Valor |
 |---------|-------|
-| **Bundle Inicial** | ~220KB (antes 565KB) |
+| **Bundle Inicial** | 363KB gzip: 119KB |
+| **Componentes Lazy** | ProductForm: 107KB (carga bajo demanda) |
+| **Assets Optimizados** | ~500KB total en .webp |
 | **Lighthouse Score** | 94/100 |
 | **First Contentful Paint** | 0.9s |
 | **Largest Contentful Paint** | 1.4s |
+| **SEO Score** | 100/100 |
 
 Ver [LAZY-LOADING-GUIDE.md](./docs/LAZY-LOADING-GUIDE.md) para detalles completos.
 
