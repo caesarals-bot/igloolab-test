@@ -35,22 +35,26 @@
 - **💰 Formato de Precios** - Intl.NumberFormat con pesos colombianos
 
 ### Administración
+- **🔐 Autenticación JWT** - Login, registro y refresh automático de tokens
+- **👤 Gestión de Usuarios** - Roles (admin/user) y perfil en sidebar
 - **📊 Dashboard Completo** - Estadísticas en tiempo real y acciones rápidas
 - **📦 Gestión de Medicamentos** - CRUD completo con API REST integrada
 - **🖼️ Gestión de Imágenes** - Upload con optimización automática + URL externa
 - **🎛️ Panel de Configuración** - Ajustes de perfil y sistema
 - **🗂️ Sidebar Navegable** - Menú lateral colapsable con estados activos
+- **🛡️ Rutas Protegidas** - ProtectedRoute con verificación de roles
 - **🔄 Modo Demostración** - Fallback inteligente a mock data si backend offline
 
 ### Técnico
-- **🔒 Seguridad Documentada** - Guía completa de implementación (AUTHENTICATION.md)
+- **🔐 Autenticación JWT** - Access tokens (24h) + Refresh tokens (7d) con renovación automática
+- **🔒 Axios Interceptors** - Auto-refresh de tokens y manejo de errores
 - **🔗 Backend Integrado** - Context API + Axios + PostgreSQL
-- **🖼️ Cloudinary Ready** - Sistema de imágenes escalable (ver docs/CLOUDINARY-SETUP.md)
+- **🖼️ Cloudinary Ready** - Sistema de imágenes escalable con optimización automática
 - **⚡ Optimización Extrema** - Lazy loading + Suspense + Code splitting (-61% bundle)
 - **🔍 SEO Completo** - Meta tags, Open Graph, Twitter Cards, JSON-LD, Sitemap
 - **🎨 UI/UX Excepcional** - TailwindCSS 4 con componentes shadcn/ui + Loading skeletons
 - **📱 100% Responsive** - Desktop, tablet y mobile
-- **🌐 React Router v7** - Navegación SPA con rutas protegadas preparadas
+- **🌐 React Router v7** - Navegación SPA con rutas protegidas por roles
 - **🚀 Performance** - Lighthouse 94, FCP 0.9s, LCP 1.4s
 
 ## 🚀 Inicio Rápido
@@ -81,10 +85,13 @@ http://localhost:5173
 
 ```
 igloolab-project/
+├── public/                  # Assets públicos
+│   ├── robots.txt
+│   └── sitemap.xml
 ├── src/
 │   ├── admin/               # Módulo de administración
 │   │   ├── components/      # ProductTable, ProductForm
-│   │   ├── layout/          # AdminLayout (sidebar)
+│   │   ├── layout/          # AdminLayout (sidebar + user info)
 │   │   └── page/            # Dashboard, Medications, Settings
 │   ├── app/
 │   │   ├── components/      # Componentes públicos
@@ -96,35 +103,35 @@ igloolab-project/
 │   │   ├── home/            # HomePage
 │   │   ├── products/        # ProductsPage, ProductCard, Modal
 │   │   └── layout/          # LayoutPage principal
-│   ├── auth/                # Login y Register pages
-│   ├── context/             # Context API (ProductsContext, DashboardContext)
-│   ├── services/            # API services (axios)
-│   ├── data/                # mockData (productos, usuarios)
+│   ├── auth/                # LoginPage y RegisterPage
+│   ├── context/             # Context API
+│   │   ├── AuthContext.tsx      # Autenticación global
+│   │   ├── ProductsContext.tsx  # Productos global
+│   │   ├── DashboardContext.tsx # Dashboard stats
+│   │   └── index.tsx            # Exports
+│   ├── lib/
+│   │   └── api/             # Servicios API
+│   │       ├── client.ts        # Axios con interceptors JWT
+│   │       ├── auth.service.ts  # Auth endpoints
+│   │       ├── products.service.ts
+│   │       └── dashboard.service.ts
+│   ├── components/          # Componentes compartidos
+│   │   ├── ui/              # shadcn/ui components
+│   │   ├── common/          # PageLoader, PageSkeleton, ErrorBoundary, ProtectedRoute
+│   │   └── seo/             # Componente SEO
 │   ├── types/               # Definiciones TypeScript
-│   │   ├── user.types.ts
+│   │   ├── user.types.ts    # User, Auth types
 │   │   ├── product.types.ts
 │   │   └── index.ts
-│   ├── router/              # AppRouter (8 rutas)
-│   ├── components/          # shadcn/ui + componentes comunes
-│   │   ├── ui/              # shadcn/ui components
-│   │   ├── common/          # PageLoader, PageSkeleton, ErrorBoundary
-│   │   └── seo/             # Componente SEO
-│   ├── hooks/               # Custom hooks (useSEO, usePreload)
-│   ├── assets/              # Imágenes (.webp)
-│   └── lib/                 # Utilidades
-├── docs/                    # Documentación adicional
-│   ├── BACKEND-CHANGES.md    # Cambios necesarios en el backend
-│   ├── CLOUDINARY-SETUP.md   # Guía de configuración de Cloudinary
-│   ├── CONTEXT-API-GUIDE.md  # Guía de Context API
-│   ├── IMAGES-GUIDE.md       # Sistema completo de imágenes
-│   ├── LAZY-LOADING-GUIDE.md # Guía de optimización de performance
-│   ├── MIGRATION-IMAGEURL.md # Migración imagen → imageUrl
-│   ├── SEO-GUIDE.md          # Guía completa de SEO
-│   └── TEST-IMAGE-URL.md     # Diagnóstico de imágenes
-├── AGENT.md                 # Guía de desarrollo
-├── AUTHENTICATION.md        # Guía de seguridad
-├── CHANGELOG.md             # Registro de cambios
-└── README.md                # Este archivo
+│   ├── router/              # React Router
+│   │   └── AppRouter.tsx    # Definición de rutas (con ProtectedRoute)
+│   ├── hooks/               # Custom hooks
+│   │   ├── useSEO.ts
+│   │   └── usePreload.ts
+│   ├── data/                # Mock data para modo demo
+│   └── assets/              # Imágenes (.webp)
+├── docs/                    # Documentación técnica
+└── README.md                # Documentación principal
 ```
 
 ## 🛠️ Stack Tecnológico
@@ -204,10 +211,69 @@ GET    /api/dashboard      # Estadísticas
 
 Gestión de estado global con Context API:
 
+- **AuthContext** - Autenticación y gestión de usuarios
 - **ProductsContext** - CRUD de productos con fallback a mock data
 - **DashboardContext** - Estadísticas y métricas calculadas en tiempo real
 
-Ver [CONTEXT-API-GUIDE.md](./docs/CONTEXT-API-GUIDE.md) para más detalles.
+### 🔐 Autenticación JWT
+
+Sistema completo de autenticación con JSON Web Tokens integrado con el backend:
+
+#### **Características**
+
+- ✅ **Registro de usuarios** con validación de contraseñas
+- ✅ **Login** con credenciales (email + password)
+- ✅ **Access Token** (24h) + **Refresh Token** (7d)
+- ✅ **Auto-refresh** transparente cuando expira el token
+- ✅ **Persistencia de sesión** con localStorage
+- ✅ **Rutas protegidas** con verificación de roles
+- ✅ **Logout** con limpieza de tokens
+
+#### **Endpoints de Autenticación**
+
+```bash
+POST   /api/auth/register    # Crear cuenta
+POST   /api/auth/login       # Iniciar sesión
+POST   /api/auth/refresh     # Renovar token
+GET    /api/auth/me          # Usuario actual
+POST   /api/auth/logout      # Cerrar sesión
+```
+
+#### **Flujo de Autenticación**
+
+```typescript
+// 1. Usuario hace login
+const { user, login } = useAuthContext()
+await login({ email, password })
+
+// 2. Token se agrega automáticamente a todos los requests
+// (Axios interceptor)
+
+// 3. Si token expira, se renueva automáticamente
+// (Transparente para el usuario)
+
+// 4. Rutas protegidas verifican autenticación
+<ProtectedRoute allowedRoles={['admin', 'user']}>
+  <AdminLayout />
+</ProtectedRoute>
+```
+
+#### **Componentes de Auth**
+
+- **LoginPage** - Formulario de inicio de sesión
+- **RegisterPage** - Formulario de registro con validaciones
+- **ProtectedRoute** - HOC para proteger rutas privadas
+- **AuthContext** - Estado global de autenticación
+- **Axios Interceptors** - Auto-agregar token y auto-refresh
+
+#### **Seguridad**
+
+- 🔒 Passwords hasheados con bcrypt (backend)
+- 🔐 JWT firmados con secretos seguros
+- ⏱️ Tokens con expiración configurable
+- 🔄 Renovación automática de tokens
+- 🛡️ Validación de roles (admin/user)
+- 🚪 Logout seguro con limpieza completa
 
 ### 🔄 Modo Demostración (Sin Backend)
 

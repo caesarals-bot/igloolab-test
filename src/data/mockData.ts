@@ -13,8 +13,12 @@ import omeprazoleImg from "@/assets/omeprazole-capsules-box.webp"
 
 // 3. Un usuario de ejemplo
 export const mockUser: User = {
+  id: "user-mock-001",
   nombre: "Dr. Ana Torres",
   email: "a.torres@igloolab.co",
+  role: "admin",
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
 }
 
 // 4. Una lista de productos de ejemplo
