@@ -70,12 +70,8 @@ apiClient.interceptors.response.use(
 
         const refreshToken = localStorage.getItem('refreshToken')
         if (!refreshToken) {
-          // No hay refresh token, limpiar y dejar que AuthContext maneje
           processQueue(error, null)
           isRefreshing = false
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
-          localStorage.removeItem('user')
           return Promise.reject(error)
         }
 
@@ -102,8 +98,8 @@ apiClient.interceptors.response.use(
 
           // Reintentar el request original
           return apiClient(originalRequest)
-        } catch (refreshError) {
-          // Refresh falló, limpiar tokens y dejar que AuthContext maneje
+        } catch (refreshError: any) {
+          // Refresh falló, limpiar tokens
           processQueue(refreshError, null)
           localStorage.removeItem('accessToken')
           localStorage.removeItem('refreshToken')

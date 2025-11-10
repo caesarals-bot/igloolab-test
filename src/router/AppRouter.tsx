@@ -1,6 +1,5 @@
 import { lazy } from "react"
 import { createBrowserRouter } from "react-router"
-import { ProtectedRoute } from "@/components/common/ProtectedRoute"
 
 // Layouts cargados síncronamente (necesarios para la estructura)
 import LayoutPage from "../app/layout/LayoutPage"
@@ -44,11 +43,7 @@ const AppRouter = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: (
-            <ProtectedRoute allowedRoles={['admin', 'user']}>
-                <AdminLayout />
-            </ProtectedRoute>
-        ),
+        element: <AdminLayout />,
         children: [
             {
                 path: "/admin/dashboard",

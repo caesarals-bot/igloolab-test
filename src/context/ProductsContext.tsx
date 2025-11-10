@@ -64,7 +64,6 @@ export const ProductsProvider: React.FC<{ children: ReactNode }> = ({ children }
       setProducts(data.products)
       setPagination(data.pagination)
     } catch (err: any) {
-      console.warn('Backend no disponible, usando mock data:', err.message)
       
       // Fallback a mock data si el backend no está disponible
       const limit = params?.limit || 10

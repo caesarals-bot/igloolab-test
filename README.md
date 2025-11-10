@@ -17,9 +17,9 @@
   ![Performance](https://img.shields.io/badge/Bundle-360KB-blue)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
   
-  [Demo](https://igloolab.co) • [Documentación](./docs) • [Changelog](./CHANGELOG.md)
+  [Documentación Técnica](./TECHNICAL.md)
   
-  **⚡ -61% Bundle Size • 🔍 SEO 100/100 • 🚀 Lighthouse 94 • 📱 100% Responsive**
+  **⚡ Bundle Optimizado • 🔐 Auth JWT • 📊 Dashboard Completo • 📱 100% Responsive**
   
 </div>
 
@@ -61,8 +61,9 @@
 
 ### Prerrequisitos
 
-- Node.js 22.16.0 
+- Node.js 18.0.0 o superior
 - npm o pnpm
+- Backend API corriendo en http://localhost:3000 (opcional)
 
 ### Instalación
 
@@ -199,12 +200,22 @@ El frontend está integrado con un backend REST API:
 # Backend debe estar corriendo en:
 http://localhost:3000
 
-# Endpoints disponibles:
-GET    /api/products       # Listar productos
-POST   /api/products       # Crear producto
-PUT    /api/products/:id   # Actualizar producto
-DELETE /api/products/:id   # Eliminar producto
-GET    /api/dashboard      # Estadísticas
+# Endpoints de Autenticación:
+POST   /api/auth/register       # Registro de usuarios
+POST   /api/auth/login          # Inicio de sesión
+POST   /api/auth/refresh        # Renovar token
+GET    /api/auth/me             # Usuario actual
+
+# Endpoints de Productos:
+GET    /api/products            # Listar productos (paginado, búsqueda, ordenamiento)
+POST   /api/products            # Crear producto
+GET    /api/products/:id        # Obtener producto por ID
+PUT    /api/products/:id        # Actualizar producto
+DELETE /api/products/:id        # Eliminar producto
+
+# Endpoints de Dashboard:
+GET    /api/dashboard/stats         # Estadísticas generales
+GET    /api/dashboard/expiry-status # Estado de vencimientos
 ```
 
 ### Context API
@@ -338,14 +349,7 @@ Sistema completo de gestión de imágenes con soporte dual:
 - Fallback a placeholder si falla
 - Error handling con mensajes claros
 
-#### 📚 **Documentación**
-
-- [IMAGES-GUIDE.md](./docs/IMAGES-GUIDE.md) - Guía completa del sistema
-- [CLOUDINARY-SETUP.md](./docs/CLOUDINARY-SETUP.md) - Integración con Cloudinary
-- [MIGRATION-IMAGEURL.md](./docs/MIGRATION-IMAGEURL.md) - Migración backend
-- [TEST-IMAGE-URL.md](./docs/TEST-IMAGE-URL.md) - Diagnóstico y testing
-
-## ⚡ Performance y Optimización
+### ⚡ Performance y Optimización
 
 El proyecto implementa técnicas avanzadas de optimización:
 
@@ -373,7 +377,7 @@ El proyecto implementa técnicas avanzadas de optimización:
 | **Largest Contentful Paint** | 1.4s |
 | **SEO Score** | 100/100 |
 
-Ver [LAZY-LOADING-GUIDE.md](./docs/LAZY-LOADING-GUIDE.md) para detalles completos.
+Ver [TECHNICAL.md](./TECHNICAL.md) para detalles completos de arquitectura.
 
 ## 🔍 SEO y Optimización para Motores de Búsqueda
 
@@ -462,13 +466,7 @@ import { SEO } from "@/components/seo/SEO"
 
 ### 📚 Documentación Completa
 
-Ver [SEO-GUIDE.md](./docs/SEO-GUIDE.md) para:
-- Arquitectura SEO detallada
-- Implementación paso a paso
-- Structured Data completo
-- Testing y validación
-- Mejores prácticas
-- Troubleshooting
+Para más información sobre SEO, consulta el componente `SEO.tsx` en `src/components/seo/`.
 
 ## 🔐 Autenticación
 
@@ -492,22 +490,29 @@ Actualmente usa datos mock, preparado para integración con backend.
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-Ver [CHANGELOG.md](./CHANGELOG.md) para registro de avances.
+## 🔧 Variables de Entorno
 
-## 📄 Licencia
+Crea un archivo `.env` en la raíz del proyecto:
 
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más información.
+```env
+VITE_API_URL=http://localhost:3000/api
+```
 
-## 👥 Equipo
+## 📄 Documentación
 
-**igloolab** - Agencia digital para la industria farmacéutica
+- **[TECHNICAL.md](./TECHNICAL.md)** - Documentación técnica detallada
+  - Arquitectura del proyecto
+  - Patrones de diseño implementados
+  - Estructura de Context API
+  - Sistema de autenticación JWT
+  - Interceptores de Axios
+  - Gestión de estados
 
-- Website: [igloolab.co](https://igloolab.co)
-- Email: contacto@igloolab.co
+## 👥 Desarrollo
 
-### Desarrollo
+**Proyecto desarrollado para prueba técnica**
 
-- **Cesar Londoño** - Developer
+- **Cesar Londoño** - Full Stack Developer
 
 ## 🙏 Agradecimientos
 

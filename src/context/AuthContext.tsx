@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { authService } from '@/lib/api'
 import type { User, RegisterData, LoginData } from '@/types'
@@ -32,11 +32,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const isCheckingAuth = useRef(false)
 
   const isAuthenticated = !!user
 
   // Verificar autenticación al cargar
   const checkAuth = useCallback(async () => {
+    // Evitar ejecuciones múltiples
+    if (isCheckingAuth.current) {
+      return
+    }
+    
+    isCheckingAuth.current = true
     try {
       setLoading(true)
       setError(null)
@@ -62,6 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem('user')
     } finally {
       setLoading(false)
+      isCheckingAuth.current = false
     }
   }, [])
 
@@ -88,7 +96,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       return true
     } catch (err: any) {
-      console.error('Login failed:', err)
       const errorMessage = err.response?.data?.message || 'Error al iniciar sesión'
       setError(errorMessage)
       return false

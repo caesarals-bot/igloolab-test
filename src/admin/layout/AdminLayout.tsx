@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { Outlet, Link, useLocation, useNavigate } from "react-router"
 import { Pill, LayoutDashboard, Package, Settings, LogOut, Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,15 @@ import { useAuthContext } from "@/context"
 const AdminLayout = () => {
     const location = useLocation()
     const navigate = useNavigate()
-    const { user, logout } = useAuthContext()
+    const { user, logout, loading, isAuthenticated } = useAuthContext()
     const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    // Protección de ruta
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            navigate("/login", { replace: true })
+        }
+    }, [loading, isAuthenticated, navigate])
 
     const handleLogout = () => {
         logout()
@@ -24,6 +31,16 @@ const AdminLayout = () => {
     ]
 
     const isActive = (path: string) => location.pathname === path
+
+    // Mostrar loader mientras verifica autenticación
+    if (loading) {
+        return <DashboardSkeleton />
+    }
+
+    // Si no está autenticado, no renderizar nada (useEffect redirige)
+    if (!isAuthenticated) {
+        return null
+    }
 
     return (
         <div className="min-h-screen bg-background">

@@ -37,7 +37,7 @@ export const mockProducts: Product[] = [
     nombre: "Paracetamol 1g",
     descripcion: "Analgésico y antipirético. Caja de 20 comprimidos.",
     precio: 85.0,
-    fechaVencimiento: "2024-11-30",
+    fechaVencimiento: "2024-10-15",
     fechaElaboracion: "2023-05-15",
     imageUrl: paracetamolImg,
   },

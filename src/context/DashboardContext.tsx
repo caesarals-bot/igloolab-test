@@ -30,10 +30,55 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     try {
       setLoading(true)
       setError(null)
+      
+      // Obtener stats del backend
       const data = await dashboardService.getStats()
+      
+      // Obtener expiry status (productos vencidos) del backend
+      const expiryStatus = await dashboardService.getExpiryStatus()
+      
+      // Combinar datos de ambos endpoints
+      // El backend ya calcula todo, solo necesitamos obtener la lista de vencidos
+      if (expiryStatus.expired > 0) {
+        
+        // Obtener lista de productos vencidos
+        try {
+          const { productsService } = await import('@/lib/api')
+          const response = await productsService.getAll({ limit: 1000 })
+          const products = response.products || []
+          
+          const now = new Date()
+          
+          // Filtrar productos vencidos
+          const expiredProducts = products.filter((p: any) => {
+            const expiryDate = new Date(p.fechaVencimiento)
+            return expiryDate < now
+          })
+          
+          const expiredProductsList = expiredProducts.map((p: any) => {
+            const expiryDate = new Date(p.fechaVencimiento)
+            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+            return {
+              id: p.id,
+              nombre: p.nombre,
+              fechaVencimiento: p.fechaVencimiento,
+              daysUntilExpiry
+            }
+          })
+          
+          data.expiredProducts = expiryStatus.expired
+          data.expiredProductsList = expiredProductsList
+        } catch (err) {
+          data.expiredProducts = expiryStatus.expired
+          data.expiredProductsList = []
+        }
+      } else {
+        data.expiredProducts = 0
+        data.expiredProductsList = []
+      }
+      
       setStats(data)
     } catch (err: any) {
-      console.warn('Backend no disponible, calculando stats desde mock data:', err.message)
       
       // Calcular stats desde mockProducts
       const totalProducts = mockProducts.length

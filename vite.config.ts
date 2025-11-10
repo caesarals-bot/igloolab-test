@@ -10,4 +10,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    hmr: {
+      overlay: true, // Mostrar errores en overlay
+    },
+  },
+  css: {
+    devSourcemap: true, // Source maps para CSS en dev
+  },
 })
